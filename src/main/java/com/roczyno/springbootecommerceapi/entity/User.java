@@ -1,6 +1,7 @@
 package com.roczyno.springbootecommerceapi.entity;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -46,6 +47,8 @@ public class User implements UserDetails, Principal {
     private String password;
     private String profilePic;
     private String phone;
+    @Embedded
+    private Address address;
     private Boolean enabled;
     private Boolean accountLocked;
     @ManyToMany(fetch = FetchType.EAGER)
