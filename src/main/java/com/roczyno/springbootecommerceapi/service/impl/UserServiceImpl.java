@@ -1,9 +1,10 @@
-package com.roczyno.springbootecommerceapi.service;
+package com.roczyno.springbootecommerceapi.service.impl;
 
 
 import com.roczyno.springbootecommerceapi.repository.UserRepository;
 import com.roczyno.springbootecommerceapi.request.UpdateUserRequest;
 import com.roczyno.springbootecommerceapi.response.UserProfileResponse;
+import com.roczyno.springbootecommerceapi.service.UserService;
 import com.roczyno.springbootecommerceapi.util.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 	private final UserRepository userRepository;
 	private final UserMapper mapper;
 	@Override
