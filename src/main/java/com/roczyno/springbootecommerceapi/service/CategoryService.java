@@ -7,10 +7,10 @@ import com.roczyno.springbootecommerceapi.response.CategoryResponse;
 import java.util.List;
 
 public interface CategoryService {
-	CategoryResponse getCategory(Long id);
+	CategoryResponse getCategory(String name);
 	List<CategoryResponse> getAllCategories();
 	CategoryResponse addCategory(CategoryRequest category);
 	CategoryResponse updateCategory(CategoryRequest category, Long id);
 	String deleteCategory(Long id);
-	boolean isCategoryExist(Category category);
+	Category findCategory(String name);
 }

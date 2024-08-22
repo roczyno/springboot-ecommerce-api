@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -26,6 +27,7 @@ public class ProductServiceImpl implements ProductService {
 	private final CategoryMapper categoryMapper;
 	private final ProductRepository productRepository;
 	private final ProductMapper productMapper;
+
 
 
 	@Override
@@ -42,18 +44,22 @@ public class ProductServiceImpl implements ProductService {
 				.color(req.color())
 				.sizes(req.sizes())
 				.imageUrl(req.imageUrl())
+				.createdAt(LocalDateTime.now())
 				.build();
 
-		Category category=categoryMapper.toMapToCategory(categoryService.getCategory(req.category().getId()));
+
+		Category category=categoryService.findCategory(req.category().getName());
 		if(category==null){
-			category=Category.builder()
+			Category newCategory=Category.builder()
 					.name(req.category().getName())
 					.build();
-			categoryService.addCategory(new CategoryRequest(category.getName()));
+			Category newSavedCategory=categoryMapper
+					.toMapToCategory(categoryService.addCategory(new CategoryRequest(newCategory.getName())));
+			product.setCategory(newSavedCategory);
+			return productMapper.mapToProductResponse(productRepository.save(product));
 		}
 		product.setCategory(category);
-		Product saveProduct=productRepository.save(product);
-		return productMapper.mapToProductResponse(saveProduct);
+		return productMapper.mapToProductResponse(productRepository.save(product));
 	}
 
 	@Override
@@ -82,7 +88,7 @@ public class ProductServiceImpl implements ProductService {
 		Optional.ofNullable(req.sizes()).ifPresent(existingProduct::setSizes);
 		Optional.ofNullable(req.imageUrl()).ifPresent(existingProduct::setImageUrl);
 		Optional.ofNullable(req.category()).ifPresent(categoryRequest -> {
-			Category category =categoryMapper.toMapToCategory(categoryService.getCategory(categoryRequest.getId()));
+			Category category =categoryMapper.toMapToCategory(categoryService.getCategory(categoryRequest.getName()));
 			if (category == null) {
 				category = Category.builder()
 						.name(categoryRequest.getName())
@@ -119,14 +125,13 @@ public class ProductServiceImpl implements ProductService {
 					.filter(p -> colors.stream().anyMatch(c -> c.equalsIgnoreCase(p.getColor())))
 					.collect(Collectors.toList());
 		}
-
 		if (sizes != null && !sizes.isEmpty()) {
 			products = products.stream()
-					.filter(p -> sizes.stream().anyMatch(s ->
-							p.getSizes().stream().anyMatch(size -> size.getName().equalsIgnoreCase(s))
-					))
+					.filter(p -> sizes.stream().anyMatch(s -> s.equalsIgnoreCase(p.getColor())))
 					.collect(Collectors.toList());
 		}
+
+
 
 		if (stock != null) {
 			products = switch (stock) {

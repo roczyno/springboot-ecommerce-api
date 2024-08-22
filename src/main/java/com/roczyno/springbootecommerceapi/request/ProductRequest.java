@@ -1,7 +1,6 @@
 package com.roczyno.springbootecommerceapi.request;
 
 import com.roczyno.springbootecommerceapi.entity.Category;
-import com.roczyno.springbootecommerceapi.entity.Size;
 
 
 import java.util.Set;
@@ -15,7 +14,7 @@ public record ProductRequest(
 		int quantity,
 		String brand,
 		String color,
-		Set<Size> sizes,
+		Set<String> sizes,
 		String imageUrl,
 		Category category
 ) {

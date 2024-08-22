@@ -43,4 +43,5 @@ public class ProductMapper {
 				.createdAt(productResponse.createdAt())
 				.build();
 	}
+
 }

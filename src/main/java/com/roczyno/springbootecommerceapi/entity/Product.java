@@ -1,5 +1,6 @@
 package com.roczyno.springbootecommerceapi.entity;
 
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -11,6 +12,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -34,8 +36,8 @@ public class Product {
 	private int quantity;
 	private String brand;
 	private String color;
-	@OneToMany
-	private Set<Size> sizes= new HashSet<>();
+	@ElementCollection
+	private Set<String> sizes= new HashSet<>();
 	private String imageUrl;
 	private int numOfRatings;
 	@ManyToOne

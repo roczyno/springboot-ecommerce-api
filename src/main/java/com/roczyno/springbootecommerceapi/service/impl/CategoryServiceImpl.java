@@ -18,9 +18,12 @@ public class CategoryServiceImpl implements CategoryService {
 	private final CategoryMapper categoryMapper;
 
 	@Override
-	public CategoryResponse getCategory(Long id) {
-		Category category=categoryRepository.findById(id).orElseThrow();
+	public CategoryResponse getCategory(String name) {
+		Category category=categoryRepository.findByName(name);
 		return categoryMapper.mapToCategoryResponse(category);
+	}
+	public Category findCategory(String name){
+		return categoryRepository.findByName(name);
 	}
 
 	@Override
@@ -55,8 +58,5 @@ public class CategoryServiceImpl implements CategoryService {
 		return "category deleted";
 	}
 
-	@Override
-	public boolean isCategoryExist(Category category) {
-		return categoryRepository.findByName(category.getName());
-	}
+
 }

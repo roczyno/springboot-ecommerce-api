@@ -1,12 +1,8 @@
 package com.roczyno.springbootecommerceapi.response;
 
 import com.roczyno.springbootecommerceapi.entity.Category;
-import com.roczyno.springbootecommerceapi.entity.Size;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Set;
 
 public record ProductResponse(
@@ -19,7 +15,7 @@ public record ProductResponse(
 		int quantity,
 		String brand,
 		String color,
-		Set<Size> sizes,
+		Set<String> sizes,
 		String imageUrl,
 		int numOfRatings,
 		Category category,
