@@ -12,4 +12,11 @@ public class CategoryMapper {
 				category.getName()
 		);
 	}
+
+	public Category toMapToCategory(CategoryResponse categoryResponse) {
+		return Category.builder()
+				.id(categoryResponse.id())
+				.name(categoryResponse.name())
+				.build();
+	}
 }

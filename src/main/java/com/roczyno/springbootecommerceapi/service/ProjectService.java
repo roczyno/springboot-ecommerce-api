@@ -10,7 +10,7 @@ import org.springframework.security.core.Authentication;
 import java.util.List;
 
 public interface ProjectService {
-	ProductResponse createProduct(ProductRequest req,Authentication connectedUser);
+	ProductResponse createProduct(ProductRequest req);
 	String deleteProduct(Long productId, Authentication connectedUser);
 	ProductResponse updateProduct(Long productId, ProductRequest req,Authentication connectedUser);
 	ProductResponse findProductById(Long productId);

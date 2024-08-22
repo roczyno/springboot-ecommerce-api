@@ -54,4 +54,9 @@ public class CategoryServiceImpl implements CategoryService {
 		categoryRepository.delete(category);
 		return "category deleted";
 	}
+
+	@Override
+	public boolean isCategoryExist(Category category) {
+		return categoryRepository.findByName(category.getName());
+	}
 }

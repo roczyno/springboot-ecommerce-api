@@ -1,5 +1,6 @@
 package com.roczyno.springbootecommerceapi.service;
 
+import com.roczyno.springbootecommerceapi.entity.Category;
 import com.roczyno.springbootecommerceapi.request.CategoryRequest;
 import com.roczyno.springbootecommerceapi.response.CategoryResponse;
 
@@ -11,4 +12,5 @@ public interface CategoryService {
 	CategoryResponse addCategory(CategoryRequest category);
 	CategoryResponse updateCategory(CategoryRequest category, Long id);
 	String deleteCategory(Long id);
+	boolean isCategoryExist(Category category);
 }

@@ -15,7 +15,7 @@ public record ProductRequest(
 		int quantity,
 		String brand,
 		String color,
-		Set<Size> size,
+		Set<Size> sizes,
 		String imageUrl,
 		Category category
 ) {
