@@ -8,7 +8,7 @@ import com.roczyno.springbootecommerceapi.request.CategoryRequest;
 import com.roczyno.springbootecommerceapi.request.ProductRequest;
 import com.roczyno.springbootecommerceapi.response.ProductResponse;
 import com.roczyno.springbootecommerceapi.service.CategoryService;
-import com.roczyno.springbootecommerceapi.service.ProjectService;
+import com.roczyno.springbootecommerceapi.service.ProductService;
 import com.roczyno.springbootecommerceapi.util.CategoryMapper;
 import com.roczyno.springbootecommerceapi.util.ProductMapper;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ProductServiceImpl implements ProjectService {
+public class ProductServiceImpl implements ProductService {
 	private final CategoryService categoryService;
 	private final CategoryMapper categoryMapper;
 	private final ProductRepository productRepository;
@@ -110,13 +110,13 @@ public class ProductServiceImpl implements ProjectService {
 	}
 
 	@Override
-	public List<ProductResponse> getAllProducts(String category, List<String> color, List<String> sizes, Integer minPrice,
+	public List<ProductResponse> getAllProducts(String category, List<String> colors, List<String> sizes, Integer minPrice,
 												Integer maxPrice, Integer minDiscount, String stock, String sort) {
 		List<Product> products = productRepository.filterProduct(category, minPrice, maxPrice, minDiscount, sort);
 
-		if (color != null && !color.isEmpty()) {
+		if (colors != null && !colors.isEmpty()) {
 			products = products.stream()
-					.filter(p -> color.stream().anyMatch(c -> c.equalsIgnoreCase(p.getColor())))
+					.filter(p -> colors.stream().anyMatch(c -> c.equalsIgnoreCase(p.getColor())))
 					.collect(Collectors.toList());
 		}
 
@@ -140,6 +140,14 @@ public class ProductServiceImpl implements ProjectService {
 			};
 		}
 
+		return products.stream()
+				.map(productMapper::mapToProductResponse)
+				.collect(Collectors.toList());
+	}
+
+	@Override
+	public List<ProductResponse> searchForProducts(String keyword) {
+		List<Product> products=productRepository.search(keyword);
 		return products.stream()
 				.map(productMapper::mapToProductResponse)
 				.collect(Collectors.toList());

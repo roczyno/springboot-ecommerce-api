@@ -8,7 +8,7 @@ import com.roczyno.springbootecommerceapi.response.ProductResponse;
 
 import java.util.List;
 
-public interface ProjectService {
+public interface ProductService {
 	ProductResponse createProduct(ProductRequest req);
 	String deleteProduct(Long productId);
 	ProductResponse updateProduct(Long productId, ProductRequest req);
@@ -16,4 +16,6 @@ public interface ProjectService {
 	List<ProductResponse> findProductByCategory(Category category);
 	List<ProductResponse> getAllProducts(String category, List<String> color, List<String> sizes, Integer minPrice,
 								 Integer maxPrice, Integer minDiscount, String stock,String sort);
+
+	List<ProductResponse> searchForProducts(String keyword);
 }
