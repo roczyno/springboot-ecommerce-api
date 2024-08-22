@@ -5,6 +5,7 @@ import com.roczyno.springbootecommerceapi.entity.Product;
 import com.roczyno.springbootecommerceapi.entity.User;
 import com.roczyno.springbootecommerceapi.exception.ProductException;
 import com.roczyno.springbootecommerceapi.repository.ProductRepository;
+import com.roczyno.springbootecommerceapi.request.CategoryRequest;
 import com.roczyno.springbootecommerceapi.request.ProductRequest;
 import com.roczyno.springbootecommerceapi.response.ProductResponse;
 import com.roczyno.springbootecommerceapi.service.CategoryService;
@@ -14,6 +15,7 @@ import com.roczyno.springbootecommerceapi.util.ProductMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -27,6 +29,7 @@ public class ProductServiceImpl implements ProjectService {
 
 
 	@Override
+	@Transactional
 	public ProductResponse createProduct(ProductRequest req) {
 		Product product=Product.builder()
 				.title(req.title())
@@ -42,17 +45,15 @@ public class ProductServiceImpl implements ProjectService {
 				.build();
 
 		Category category=categoryMapper.toMapToCategory(categoryService.getCategory(req.category().getId()));
-		Product saveProduct;
+
 		if(category==null){
-			Category newCategory=Category.builder()
+			category=Category.builder()
 					.name(req.category().getName())
 					.build();
-			product.setCategory(newCategory);
-			saveProduct=productRepository.save(product);
-			return productMapper.mapToProductResponse(saveProduct);
+			categoryService.addCategory(new CategoryRequest(category.getName()));
 		}
 		product.setCategory(category);
-		saveProduct=productRepository.save(product);
+		Product saveProduct=productRepository.save(product);
 		return productMapper.mapToProductResponse(saveProduct);
 	}
 
