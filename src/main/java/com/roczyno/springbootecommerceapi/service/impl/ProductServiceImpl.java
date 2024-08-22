@@ -2,7 +2,6 @@ package com.roczyno.springbootecommerceapi.service.impl;
 
 import com.roczyno.springbootecommerceapi.entity.Category;
 import com.roczyno.springbootecommerceapi.entity.Product;
-import com.roczyno.springbootecommerceapi.entity.User;
 import com.roczyno.springbootecommerceapi.exception.ProductException;
 import com.roczyno.springbootecommerceapi.repository.ProductRepository;
 import com.roczyno.springbootecommerceapi.request.CategoryRequest;
@@ -13,11 +12,12 @@ import com.roczyno.springbootecommerceapi.service.ProjectService;
 import com.roczyno.springbootecommerceapi.util.CategoryMapper;
 import com.roczyno.springbootecommerceapi.util.ProductMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +45,6 @@ public class ProductServiceImpl implements ProjectService {
 				.build();
 
 		Category category=categoryMapper.toMapToCategory(categoryService.getCategory(req.category().getId()));
-
 		if(category==null){
 			category=Category.builder()
 					.name(req.category().getName())
@@ -58,27 +57,92 @@ public class ProductServiceImpl implements ProjectService {
 	}
 
 	@Override
-	public String deleteProduct(Long productId, Authentication connectedUser) {
-		return "";
+	public String deleteProduct(Long productId) {
+		Product product=productMapper.mapToProduct(findProductById(productId));
+		productRepository.delete(product);
+		return "Product deleted successfully";
 	}
 
 	@Override
-	public ProductResponse updateProduct(Long productId, ProductRequest req, Authentication connectedUser) {
-		return null;
+	public ProductResponse updateProduct(Long productId, ProductRequest req) {
+		Product product=productMapper.mapToProduct(findProductById(productId));
+		Product updatedProduct=updateExistingProduct(product,req);
+		return productMapper.mapToProductResponse(updatedProduct);
+	}
+
+	private Product updateExistingProduct(Product existingProduct, ProductRequest req) {
+		Optional.ofNullable(req.title()).ifPresent(existingProduct::setTitle);
+		Optional.ofNullable(req.description()).ifPresent(existingProduct::setDescription);
+		Optional.of(req.price()).ifPresent(existingProduct::setPrice);
+		Optional.of(req.discountPrice()).ifPresent(existingProduct::setDiscountPrice);
+		Optional.of(req.discountPricePercent()).ifPresent(existingProduct::setDiscountPricePercent);
+		Optional.of(req.quantity()).ifPresent(existingProduct::setQuantity);
+		Optional.ofNullable(req.brand()).ifPresent(existingProduct::setBrand);
+		Optional.ofNullable(req.color()).ifPresent(existingProduct::setColor);
+		Optional.ofNullable(req.sizes()).ifPresent(existingProduct::setSizes);
+		Optional.ofNullable(req.imageUrl()).ifPresent(existingProduct::setImageUrl);
+		Optional.ofNullable(req.category()).ifPresent(categoryRequest -> {
+			Category category =categoryMapper.toMapToCategory(categoryService.getCategory(categoryRequest.getId()));
+			if (category == null) {
+				category = Category.builder()
+						.name(categoryRequest.getName())
+						.build();
+				categoryService.addCategory(new CategoryRequest(category.getName()));
+			}
+			existingProduct.setCategory(category);
+		});
+		return productRepository.save(existingProduct);
 	}
 
 	@Override
 	public ProductResponse findProductById(Long productId) {
-		return null;
+		Product product=productRepository.findById(productId).
+				orElseThrow(()->new ProductException("Product not found"));
+		return productMapper.mapToProductResponse(product);
 	}
 
 	@Override
-	public List<ProductResponse> findProductByCategory(String category) {
-		return List.of();
+	public List<ProductResponse> findProductByCategory(Category category) {
+		List<Product> products=productRepository.findByCategory(category);
+		return products.stream()
+				.map(productMapper::mapToProductResponse)
+				.toList();
 	}
 
 	@Override
-	public List<Product> getAllProducts(String category, List<String> color, List<String> sizes, Integer minPrice, Integer maxPrice, Integer minDiscount, String stock) {
-		return List.of();
+	public List<ProductResponse> getAllProducts(String category, List<String> color, List<String> sizes, Integer minPrice,
+												Integer maxPrice, Integer minDiscount, String stock, String sort) {
+		List<Product> products = productRepository.filterProduct(category, minPrice, maxPrice, minDiscount, sort);
+
+		if (color != null && !color.isEmpty()) {
+			products = products.stream()
+					.filter(p -> color.stream().anyMatch(c -> c.equalsIgnoreCase(p.getColor())))
+					.collect(Collectors.toList());
+		}
+
+		if (sizes != null && !sizes.isEmpty()) {
+			products = products.stream()
+					.filter(p -> sizes.stream().anyMatch(s ->
+							p.getSizes().stream().anyMatch(size -> size.getName().equalsIgnoreCase(s))
+					))
+					.collect(Collectors.toList());
+		}
+
+		if (stock != null) {
+			products = switch (stock) {
+				case "in_stock" -> products.stream()
+						.filter(p -> p.getQuantity() > 0)
+						.collect(Collectors.toList());
+				case "out_of_stock" -> products.stream()
+						.filter(p -> p.getQuantity() < 1)
+						.collect(Collectors.toList());
+				default -> products;
+			};
+		}
+
+		return products.stream()
+				.map(productMapper::mapToProductResponse)
+				.collect(Collectors.toList());
 	}
+
 }
