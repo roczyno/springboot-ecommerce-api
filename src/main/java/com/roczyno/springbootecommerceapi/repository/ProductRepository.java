@@ -1,6 +1,5 @@
 package com.roczyno.springbootecommerceapi.repository;
 
-import com.roczyno.springbootecommerceapi.entity.Category;
 import com.roczyno.springbootecommerceapi.entity.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -9,7 +8,9 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface ProductRepository extends JpaRepository<Product,Long> {
-	List<Product> findByCategory(Category category);
+
+	@Query("select p from Product p where p.category.name=:category" )
+	List<Product> findByCategory(@Param("category") String category);
 
 	@Query("SELECT p FROM Product p " +
 			"WHERE (:category IS NULL OR p.category.name = :category) " +
@@ -25,6 +26,6 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
 								@Param("minDiscount") Integer minDiscount,
 								@Param("sort") String sort);
 
-	@Query("select p from Product p where p.title =:keyword or p.description=:key or p.brand=:keyword")
+	@Query("select p from Product p where p.title =:keyword or p.description=:keyword or p.brand=:keyword")
 	List<Product> search(@Param("keyword") String keyword);
 }

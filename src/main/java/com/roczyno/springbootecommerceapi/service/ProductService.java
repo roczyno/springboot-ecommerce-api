@@ -13,7 +13,7 @@ public interface ProductService {
 	String deleteProduct(Long productId);
 	ProductResponse updateProduct(Long productId, ProductRequest req);
 	ProductResponse findProductById(Long productId);
-	List<ProductResponse> findProductByCategory(Category category);
+	List<ProductResponse> findProductByCategory(String category);
 	List<ProductResponse> getAllProducts(String category, List<String> color, List<String> sizes, Integer minPrice,
 								 Integer maxPrice, Integer minDiscount, String stock,String sort);
 

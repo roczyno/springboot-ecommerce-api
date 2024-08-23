@@ -30,14 +30,14 @@ public class ProductController {
 		return ResponseHandler.successResponse(productService.createProduct(request), HttpStatus.OK);
 	}
 	@GetMapping
-	public ResponseEntity<Object> getAllProducts( @RequestParam String category,
-												  @RequestParam List<String> colors,
-												  @RequestParam List<String> sizes,
-												  @RequestParam Integer minPrice,
-												  @RequestParam Integer maxPrice,
-												  @RequestParam Integer minDiscount,
-												  @RequestParam String sort,
-												  @RequestParam String stock){
+	public ResponseEntity<Object> getAllProducts( @RequestParam(required = false) String category,
+												  @RequestParam(required = false) List<String> colors,
+												  @RequestParam(required = false) List<String> sizes,
+												  @RequestParam(required = false) Integer minPrice,
+												  @RequestParam(required = false) Integer maxPrice,
+												  @RequestParam(required = false) Integer minDiscount,
+												  @RequestParam(required = false) String sort,
+												  @RequestParam(required = false) String stock){
 		return ResponseHandler.successResponse(productService.getAllProducts(
 				category, colors, sizes, minPrice, maxPrice,
 				minDiscount, sort, stock),HttpStatus.OK);
@@ -49,7 +49,7 @@ public class ProductController {
 	}
 
 	@GetMapping("/cat")
-	public ResponseEntity<Object> findProductByCategory(@RequestParam Category cat){
+	public ResponseEntity<Object> findProductByCategory(@RequestParam String cat){
 		return ResponseHandler.successResponse(productService.findProductByCategory(cat),HttpStatus.OK);
 	}
 

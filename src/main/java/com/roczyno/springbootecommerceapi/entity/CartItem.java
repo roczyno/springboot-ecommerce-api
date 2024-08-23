@@ -28,5 +28,8 @@ public class CartItem {
 	private int quantity;
 	private Integer price;
 	private Integer discountedPrice;
-	private long userId;
+	@ManyToOne
+	private User user;
+	@ManyToOne
+	private Cart cart;
 }

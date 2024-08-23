@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -34,4 +35,5 @@ public class Cart {
 	private int totalItems;
 	private int totalDiscountedPrice;
 	private int totalDiscount;
+	private LocalDateTime createdAt;
 }
