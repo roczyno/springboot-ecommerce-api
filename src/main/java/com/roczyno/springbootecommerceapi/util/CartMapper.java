@@ -16,4 +16,15 @@ public class CartMapper {
 				cart.getTotalDiscount()
 		);
 	}
+
+	public Cart mapToCart(CartResponse cartResponse) {
+		return Cart.builder()
+				.id(cartResponse.id())
+				.cartItems(cartResponse.cartItems())
+				.totalPrice(cartResponse.totalPrice())
+				.totalItems(cartResponse.totalItems())
+				.totalDiscountedPrice(cartResponse.totalDiscountedPrice())
+				.totalDiscount(cartResponse.totalDiscount())
+				.build();
+	}
 }

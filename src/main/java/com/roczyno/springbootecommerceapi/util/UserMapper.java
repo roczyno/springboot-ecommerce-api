@@ -17,4 +17,14 @@ public class UserMapper {
 				user.getPhone()
 		);
 	}
+
+	public User toUser(UserProfileResponse userRes) {
+		return User.builder()
+				.id(userRes.id())
+				.firstName(userRes.firstName())
+				.lastName(userRes.lastName())
+				.email(userRes.email())
+				.profilePic(userRes.profilePic())
+				.build();
+	}
 }
