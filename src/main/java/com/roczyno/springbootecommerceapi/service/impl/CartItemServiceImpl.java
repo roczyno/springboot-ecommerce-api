@@ -52,13 +52,14 @@ public class CartItemServiceImpl implements CartItemService {
 	}
 
 	@Override
-	public void removeCartItem(Authentication connectedUser, Long id) {
+	public String removeCartItem(Authentication connectedUser, Long id) {
 		User user=(User) connectedUser.getPrincipal();
 		CartItem cartItem=cartItemMapper.mapToCartItem(findCartItemById(id));
 		if(!cartItem.getUser().equals(user)){
 			throw new CartItemException("Only the cart Item owner can modify");
 		}
 		cartItemRepository.delete(cartItem);
+		return "Item removed Successfully";
 	}
 
 	@Override

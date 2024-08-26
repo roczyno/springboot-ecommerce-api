@@ -11,6 +11,6 @@ public interface CartItemService {
 	CartItemResponse createCartItem (CartItemRequest cartItem,Authentication connectedUser);
 	CartItemResponse updateCartItem(Authentication connectedUser,Long id, CartItemRequest cartItem);
 	CartItemResponse isCartItemExist(Cart cart, Product product, User user, String size);
-	void removeCartItem(Authentication connectedUser, Long cartItemId);
+	String removeCartItem(Authentication connectedUser, Long cartItemId);
 	CartItemResponse findCartItemById(Long cartItemId);
 }
