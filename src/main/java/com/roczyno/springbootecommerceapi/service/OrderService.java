@@ -11,5 +11,5 @@ public interface OrderService {
 	List<OrderResponse> userOrderHistory(Integer userId);
     OrderResponse updateOrderStatus(Long orderId,String status);
 	List<OrderResponse> getAllOrders();
-	void deleteOrder(Long orderId);
+	String deleteOrder(Long orderId);
 }

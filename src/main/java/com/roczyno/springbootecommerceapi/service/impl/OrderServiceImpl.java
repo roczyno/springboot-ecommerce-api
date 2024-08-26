@@ -123,8 +123,9 @@ public class OrderServiceImpl  implements OrderService {
 
 	@Override
 	@Transactional
-	public void deleteOrder(Long orderId) {
+	public String deleteOrder(Long orderId) {
 		Order order=orderMapper.mapToOrder(findOrderById(orderId));
 		orderRepository.delete(order);
+		return "Order deleted successfully";
 	}
 }
