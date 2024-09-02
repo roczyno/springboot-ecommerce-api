@@ -1,10 +1,12 @@
 package com.roczyno.springbootecommerceapi.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,7 +31,10 @@ public class CartItem {
 	private Integer price;
 	private Integer discountedPrice;
 	@ManyToOne
+	@JoinColumn(name = "owner_id")
+	@JsonIgnore
 	private User user;
 	@ManyToOne
+	@JsonBackReference
 	private Cart cart;
 }

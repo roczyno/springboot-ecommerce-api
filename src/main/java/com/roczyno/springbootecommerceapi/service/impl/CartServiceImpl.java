@@ -5,9 +5,11 @@ import com.roczyno.springbootecommerceapi.entity.CartItem;
 import com.roczyno.springbootecommerceapi.entity.Product;
 import com.roczyno.springbootecommerceapi.entity.User;
 import com.roczyno.springbootecommerceapi.exception.CartException;
+import com.roczyno.springbootecommerceapi.exception.CartItemException;
 import com.roczyno.springbootecommerceapi.repository.CartRepository;
 import com.roczyno.springbootecommerceapi.request.AddItemRequest;
 import com.roczyno.springbootecommerceapi.request.CartItemRequest;
+import com.roczyno.springbootecommerceapi.response.CartItemResponse;
 import com.roczyno.springbootecommerceapi.response.CartResponse;
 import com.roczyno.springbootecommerceapi.service.CartItemService;
 import com.roczyno.springbootecommerceapi.service.CartService;
@@ -16,14 +18,17 @@ import com.roczyno.springbootecommerceapi.util.CartItemMapper;
 import com.roczyno.springbootecommerceapi.util.CartMapper;
 import com.roczyno.springbootecommerceapi.util.ProductMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CartServiceImpl implements CartService {
 	private final CartRepository cartRepository;
 	private final CartMapper cartMapper;
@@ -33,34 +38,38 @@ public class CartServiceImpl implements CartService {
 	private final CartItemMapper cartItemMapper;
 
 	@Override
-	public CartResponse createCart(User user) {
+	@Transactional
+	public void createCart(User user) {
 		Cart cart = Cart.builder()
 				.user(user)
 				.createdAt(LocalDateTime.now())
 				.build();
-
-		return cartMapper.mapToCartResponse(cartRepository.save(cart));
+		cartRepository.save(cart);
 	}
 
 	@Override
+	@Transactional
 	public String addCartItem(Authentication connectedUser, AddItemRequest req, Long productId) {
 		User user = (User) connectedUser.getPrincipal();
 		Cart cart = cartRepository.findByUser(user);
 		Product product = productMapper.mapToProduct(productService.findProductById(productId));
-		CartItem isPresent = cartItemMapper
-				.mapToCartItem(cartItemService.isCartItemExist(cart, product, user, req.size()));
-		if (isPresent == null) {
-			CartItem newCartItem=cartItemMapper.mapToCartItem(cartItemService.createCartItem(new CartItemRequest(
-					product, req.size(), req.quantity(), req.price(),product.getDiscountPrice()
-			), connectedUser));
+		CartItem existingCartItem = cartItemService.isCartItemExist(cart, product, user, req.size());
 
+		if (existingCartItem == null) {
+			CartItemRequest cartItemRequest =
+					new CartItemRequest(cart, product, req.size(), req.quantity(), product.getPrice(), product.getDiscountPrice());
+			CartItemResponse newCartItemResponse = cartItemService.createCartItem(cartItemRequest, user);
+			CartItem newCartItem=cartItemMapper.mapToCartItem(newCartItemResponse);
 			cart.getCartItems().add(newCartItem);
-			cartRepository.save(cart);
+
+		} else {
+			existingCartItem.setQuantity(existingCartItem.getQuantity() + req.quantity());
 		}
-		cart.getCartItems().add(isPresent);
+
 		cartRepository.save(cart);
-		return "Cart item added successfully";
+		return "Cart item added/updated successfully";
 	}
+
 
 	@Override
 	@Transactional
@@ -83,6 +92,23 @@ public class CartServiceImpl implements CartService {
 		cart.setTotalDiscount(totalPrice - totalDiscountPrice);
 		cart.setTotalItems(totalItems);
 		cart.setTotalDiscountedPrice(totalDiscountPrice);
-		return cartMapper.mapToCartResponse(cartRepository.save(cart));
+		Cart saveCart=cartRepository.save(cart);
+		return cartMapper.mapToCartResponse(saveCart);
+	}
+
+	@Override
+	@Transactional
+	public String removeItemFromCart(Long cartItemId,Authentication connectedUser) {
+		User user=(User) connectedUser.getPrincipal();
+		CartItem cartItem=cartItemMapper.mapToCartItem(cartItemService.findCartItemById(cartItemId));
+		Cart cart=cartMapper.mapToCart(findUserCart(connectedUser));
+		if(!Objects.equals(cartItem.getUser().getId(), user.getId())){
+			throw new CartItemException("Only the cart Item owner can modify");
+		}
+		cartItemService.removeCartItem(cartItem.getId());
+		cart.getCartItems().remove(cartItem);
+		cartRepository.save(cart);
+
+		return "removed successfully";
 	}
 }

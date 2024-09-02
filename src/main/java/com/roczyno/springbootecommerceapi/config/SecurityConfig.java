@@ -31,10 +31,11 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
+				.exceptionHandling(Customizer.withDefaults())
 				.cors(Customizer.withDefaults())
 				.csrf(AbstractHttpConfigurer::disable)
 				.authorizeHttpRequests(req->
-						req.requestMatchers("/auth/**","/auction/**","/ws/**").permitAll().anyRequest().authenticated())
+						req.requestMatchers("/auth/**").permitAll().anyRequest().authenticated())
 				.sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authenticationProvider(authenticationProvider)
 				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
@@ -48,7 +49,7 @@ public class SecurityConfig {
 	private CorsConfigurationSource CorsConfigurationSource() {
 		return request -> {
 			CorsConfiguration cfg = new CorsConfiguration();
-			cfg.setAllowedOrigins(Arrays.asList("http://localhost:4200","http://localhost:5173","https://bidding-app-frontend.onrender.com"));
+			cfg.setAllowedOrigins(Arrays.asList("http://localhost:4200","http://localhost:5173"));
 			cfg.setAllowedMethods(Collections.singletonList("*"));
 			cfg.setAllowedHeaders(Collections.singletonList("*"));
 			cfg.setAllowCredentials(true);

@@ -10,6 +10,8 @@ public class CartItemMapper {
 		return new CartItemResponse(
 				cartItem.getId(),
 				cartItem.getProduct(),
+				cartItem.getCart(),
+				cartItem.getUser(),
 				cartItem.getSize(),
 				cartItem.getQuantity(),
 				cartItem.getPrice(),
@@ -22,6 +24,8 @@ public class CartItemMapper {
 		return CartItem.builder()
 				.id(cartItemResponse.id())
 				.product(cartItemResponse.product())
+				.cart(cartItemResponse.cart())
+				.user(cartItemResponse.user())
 				.size(cartItemResponse.size())
 				.quantity(cartItemResponse.quantity())
 				.price(cartItemResponse.price())

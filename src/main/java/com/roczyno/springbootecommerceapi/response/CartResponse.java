@@ -1,15 +1,19 @@
 package com.roczyno.springbootecommerceapi.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.roczyno.springbootecommerceapi.entity.CartItem;
+import com.roczyno.springbootecommerceapi.entity.User;
 
-import java.util.Set;
+import java.util.List;
 
 public record CartResponse(
 		Long id,
-		Set<CartItem> cartItems,
+		List<CartItem> cartItems,
 		double totalPrice,
 		int totalItems,
 		int totalDiscountedPrice,
-		int totalDiscount
+		int totalDiscount,
+		@JsonIgnore
+		User user
 ) {
 }

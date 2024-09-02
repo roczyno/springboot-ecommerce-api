@@ -13,7 +13,8 @@ public class CartMapper {
 				cart.getTotalPrice(),
 				cart.getTotalItems(),
 				cart.getTotalDiscountedPrice(),
-				cart.getTotalDiscount()
+				cart.getTotalDiscount(),
+				cart.getUser()
 		);
 	}
 
@@ -25,6 +26,7 @@ public class CartMapper {
 				.totalItems(cartResponse.totalItems())
 				.totalDiscountedPrice(cartResponse.totalDiscountedPrice())
 				.totalDiscount(cartResponse.totalDiscount())
+				.user(cartResponse.user())
 				.build();
 	}
 }

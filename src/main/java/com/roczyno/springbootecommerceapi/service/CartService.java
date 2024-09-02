@@ -6,7 +6,8 @@ import com.roczyno.springbootecommerceapi.response.CartResponse;
 import org.springframework.security.core.Authentication;
 
 public interface CartService {
-	CartResponse createCart(User user);
+	void createCart(User user);
 	String addCartItem(Authentication connectedUser, AddItemRequest req,Long productId);
 	CartResponse findUserCart(Authentication connectedUser);
+	String removeItemFromCart(Long id,Authentication connectedUser);
 }

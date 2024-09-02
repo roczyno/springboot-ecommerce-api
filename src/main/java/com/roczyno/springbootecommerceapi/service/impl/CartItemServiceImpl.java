@@ -11,28 +11,37 @@ import com.roczyno.springbootecommerceapi.response.CartItemResponse;
 import com.roczyno.springbootecommerceapi.service.CartItemService;
 import com.roczyno.springbootecommerceapi.util.CartItemMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CartItemServiceImpl implements CartItemService {
 	private final CartItemRepository cartItemRepository;
 	private final CartItemMapper cartItemMapper;
 
+
+
 	@Override
-	public CartItemResponse createCartItem(CartItemRequest req,Authentication connectedUser) {
-		User user=(User) connectedUser.getPrincipal();
+	public CartItemResponse createCartItem(CartItemRequest req, User user) {
 		CartItem cartItem = CartItem.builder()
-				.quantity(1)
+				.quantity(req.quantity())
 				.discountedPrice(req.product().getDiscountPrice() * req.quantity())
 				.price(req.product().getPrice() * req.quantity())
+				.product(req.product())
+				.size(req.size())
 				.user(user)
+				.cart(req.cart())
 				.build();
-		return cartItemMapper.mapToCartItemResponse(cartItemRepository.save(cartItem));
+		CartItem savedCartItem = cartItemRepository.save(cartItem);
+		return cartItemMapper.mapToCartItemResponse(savedCartItem);
 	}
 
 	@Override
+	@Transactional
 	public CartItemResponse updateCartItem(Authentication connectedUser, Long id, CartItemRequest req) {
 		User user=(User) connectedUser.getPrincipal();
 		CartItem cartItem=cartItemMapper.mapToCartItem(findCartItemById(id));
@@ -47,19 +56,15 @@ public class CartItemServiceImpl implements CartItemService {
 	}
 
 	@Override
-	public CartItemResponse isCartItemExist(Cart cart, Product product, User user, String size) {
+	public CartItem isCartItemExist(Cart cart, Product product, User user, String size) {
 		return cartItemRepository.isCartItemExist(product,cart,size,user);
 	}
 
 	@Override
-	public String removeCartItem(Authentication connectedUser, Long id) {
-		User user=(User) connectedUser.getPrincipal();
+	@Transactional
+	public void removeCartItem(Long id) {
 		CartItem cartItem=cartItemMapper.mapToCartItem(findCartItemById(id));
-		if(!cartItem.getUser().equals(user)){
-			throw new CartItemException("Only the cart Item owner can modify");
-		}
 		cartItemRepository.delete(cartItem);
-		return "Item removed Successfully";
 	}
 
 	@Override

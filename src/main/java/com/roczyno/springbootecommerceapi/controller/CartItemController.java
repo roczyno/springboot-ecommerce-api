@@ -31,8 +31,5 @@ public class CartItemController {
 												 @RequestBody CartItemRequest req){
 		return ResponseHandler.successResponse(cartItemService.updateCartItem(connectedUser,id,req),HttpStatus.OK);
 	}
-	@DeleteMapping("/{id}")
-	public ResponseEntity<Object> removeCartItem(@PathVariable Long id, Authentication connectedUser){
-		return ResponseHandler.successResponse(cartItemService.removeCartItem(connectedUser,id),HttpStatus.OK);
-	}
+
 }

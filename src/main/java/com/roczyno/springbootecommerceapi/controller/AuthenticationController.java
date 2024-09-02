@@ -47,7 +47,7 @@ public class AuthenticationController {
         return ResponseEntity.ok(authenticationService.validatePasswordResetToken(token,email));
     }
     @PostMapping("/update-password")
-    public ResponseEntity<Object> updatePassword(@RequestBody PasswordUpdateRequest req, @RequestParam String email) {
+    public ResponseEntity<String> updatePassword(@RequestBody PasswordUpdateRequest req, @RequestParam String email) {
         return ResponseEntity.ok(authenticationService.updatePassword(req,email));
     }
 

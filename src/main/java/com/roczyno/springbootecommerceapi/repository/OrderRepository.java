@@ -2,6 +2,7 @@ package com.roczyno.springbootecommerceapi.repository;
 
 import com.roczyno.springbootecommerceapi.entity.Order;
 import com.roczyno.springbootecommerceapi.entity.User;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

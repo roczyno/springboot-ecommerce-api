@@ -46,7 +46,7 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final ForgotPasswordTokenRepository forgotPasswordTokenRepository;
-
+    private final CartService cartService;
     private final UserMapper userMapper;
 
 
@@ -74,7 +74,7 @@ public class AuthenticationService {
                 .roles(List.of(userRole))
                 .build();
         var savedUser=userRepository.save(user);
-
+        cartService.createCart(savedUser);
         sendValidationEmail(savedUser);
         return "user created successfully";
     }
