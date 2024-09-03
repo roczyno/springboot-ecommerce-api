@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,11 +29,17 @@ public class ReviewServiceImpl implements ReviewService {
 	private final ProductMapper productMapper;
 
 	@Override
-	public ReviewResponse createReview(ReviewRequest req, Authentication connectedUser) {
+	public ReviewResponse createReview(ReviewRequest req, Authentication connectedUser,Long productId) {
 		User user=(User) connectedUser.getPrincipal();
+		Product product=productMapper.mapToProduct(productService.findProductById(productId));
+		Optional<Review> isReviewExist=reviewRepository.findByUserAndProduct(user,product);
+		if(isReviewExist.isPresent()){
+			throw new ReviewException("You have already reviewed this product.");
+		}
 		Review review=Review.builder()
 				.user(user)
 				.review(req.review())
+				.product(product)
 				.createdAt(LocalDateTime.now())
 				.build();
 		Review saveReview=reviewRepository.save(review);
@@ -52,9 +59,7 @@ public class ReviewServiceImpl implements ReviewService {
 	public String deleteReview(Long id, Authentication connectedUser) {
 		User user=(User) connectedUser.getPrincipal();
 		Review review=reviewMapper.mapToReview(getReview(id));
-		if(!Objects.equals(user.getId(), review.getUser().getId())){
-			throw new ReviewException("Only owner can modify");
-		}
+		verifyOwnership(user,review);
 		reviewRepository.delete(review);
 		return "Deleted successfully";
 	}
@@ -63,9 +68,7 @@ public class ReviewServiceImpl implements ReviewService {
 	public ReviewResponse updateReview(Long id, Authentication connectedUser, ReviewRequest req) {
 		User user=(User) connectedUser.getPrincipal();
 		Review review=reviewMapper.mapToReview(getReview(id));
-		if(!Objects.equals(user.getId(), review.getUser().getId())){
-			throw new ReviewException("Only owner can modify");
-		}
+	    verifyOwnership(user,review);
 		review.setReview(req.review());
 		Review updatedReview=reviewRepository.save(review);
 		return reviewMapper.mapToReviewResponse(updatedReview);
@@ -76,6 +79,11 @@ public class ReviewServiceImpl implements ReviewService {
 		Review review=reviewRepository.findById(id)
 				.orElseThrow(()-> new ReviewException("review not found"));
 		return reviewMapper.mapToReviewResponse(review);
+	}
+	private void verifyOwnership(User user, Review review) {
+		if (!Objects.equals(user.getId(), review.getUser().getId())) {
+			throw new ReviewException("Only the owner can modify/delete the review.");
+		}
 	}
 
 }

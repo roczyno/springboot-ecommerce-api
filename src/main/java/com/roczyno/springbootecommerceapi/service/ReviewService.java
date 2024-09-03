@@ -7,7 +7,7 @@ import org.springframework.security.core.Authentication;
 import java.util.List;
 
 public interface ReviewService {
-	ReviewResponse createReview(ReviewRequest req, Authentication connected);
+	ReviewResponse createReview(ReviewRequest req, Authentication connected, Long productId);
 	List<ReviewResponse> getProductReviews(Long productId);
 	String deleteReview(Long id,Authentication connectedUser);
 	ReviewResponse updateReview(Long id,Authentication connectedUser,ReviewRequest req);

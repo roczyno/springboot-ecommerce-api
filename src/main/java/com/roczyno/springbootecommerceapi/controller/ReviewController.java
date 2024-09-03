@@ -22,9 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReviewController {
 	private final ReviewService reviewService;
 
-	@PostMapping
-	public ResponseEntity<Object> createReview(@RequestBody ReviewRequest req, Authentication user){
-		return ResponseHandler.successResponse(reviewService.createReview(req,user), HttpStatus.OK);
+	@PostMapping("/product/{productId}")
+	public ResponseEntity<Object> createReview(@PathVariable Long productId,@RequestBody ReviewRequest req, Authentication user){
+		return ResponseHandler.successResponse(reviewService.createReview(req,user,productId), HttpStatus.OK);
 	}
 	@GetMapping("/product/{productId}")
 	public ResponseEntity<Object> getProductReviews(@PathVariable Long productId){
