@@ -70,7 +70,7 @@ public class RatingServiceImpl implements RatingService {
 		User user=(User) connectedUser.getPrincipal();
 		Rating rating=ratingMapper.mapToRating(getRating(id));
 		verifyOwnership(user,rating);
-		rating.setRating(rating.getRating());
+		rating.setRating(req.rating());
 		Rating updatedRating=ratingRepository.save(rating);
 		return ratingMapper.mapToRatingResponse(updatedRating);
 	}
@@ -83,6 +83,17 @@ public class RatingServiceImpl implements RatingService {
 		}
 		return ratingMapper.mapToRatingResponse(rating.get());
 	}
+
+	@Override
+	public double getProductAverageRatings(Long productId) {
+		Product product=productMapper.mapToProduct(productService.findProductById(productId));
+		List<Rating> ratings=ratingRepository.findByProduct(product);
+		return ratings.stream()
+				.mapToDouble(Rating::getRating)
+				.average()
+				.orElse(0.0);
+	}
+
 
 	private void verifyOwnership(User user, Rating rating){
 		if(!Objects.equals(user.getId(), rating.getUser().getId())){

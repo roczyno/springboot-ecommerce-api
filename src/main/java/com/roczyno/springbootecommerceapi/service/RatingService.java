@@ -12,4 +12,5 @@ public interface RatingService {
 	String deleteRating (Long id,Authentication connectedUser);
 	RatingResponse updateRating(Long id,Authentication connectedUser,RatingRequest req);
 	RatingResponse getRating(Long id);
+	double getProductAverageRatings(Long productId);
 }

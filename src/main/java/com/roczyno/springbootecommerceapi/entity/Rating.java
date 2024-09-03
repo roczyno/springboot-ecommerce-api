@@ -8,6 +8,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,6 +35,7 @@ public class Rating {
 	@JoinColumn(name="product_id",nullable = false)
 	@JsonIgnore
 	private Product product;
+//	@Size(min = 1,max = 5,message = "rating should be between 1 and 5")
 	private double rating;
 	private LocalDateTime createdAt;
 }
