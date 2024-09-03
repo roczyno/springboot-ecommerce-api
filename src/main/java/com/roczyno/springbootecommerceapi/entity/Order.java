@@ -3,6 +3,7 @@ package com.roczyno.springbootecommerceapi.entity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -30,7 +31,7 @@ public class Order {
 	private Long id;
 	@ManyToOne
 	private User user;
-	@OneToMany(cascade = CascadeType.ALL)
+	@OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
 	private List<OrderItem> orderItems= new ArrayList<>();
 	private LocalDateTime orderDate;
 	private LocalDateTime deliveryDate;

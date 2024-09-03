@@ -1,5 +1,6 @@
 package com.roczyno.springbootecommerceapi.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.roczyno.springbootecommerceapi.entity.Address;
 import com.roczyno.springbootecommerceapi.entity.OrderItem;
 import com.roczyno.springbootecommerceapi.entity.User;
@@ -9,6 +10,7 @@ import java.util.List;
 
 public record OrderResponse(
 		Long id,
+		@JsonIgnore
 		User user,
 		List<OrderItem> orderItems,
 		LocalDateTime orderDate,
