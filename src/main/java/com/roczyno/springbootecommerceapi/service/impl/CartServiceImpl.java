@@ -111,4 +111,12 @@ public class CartServiceImpl implements CartService {
 
 		return "removed successfully";
 	}
+
+	@Override
+	@Transactional
+	public void clearCart(Authentication user) {
+		Cart cart=cartMapper.mapToCart(findUserCart(user));
+		cartItemService.deleteAllItemsByCartId(cart.getId());
+		cart.getCartItems().clear();
+	}
 }

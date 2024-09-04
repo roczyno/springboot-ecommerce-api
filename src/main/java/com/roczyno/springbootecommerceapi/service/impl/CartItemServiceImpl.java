@@ -73,4 +73,9 @@ public class CartItemServiceImpl implements CartItemService {
 				.orElseThrow(()-> new CartItemException("Cart Item not found"));
 		return cartItemMapper.mapToCartItemResponse(cartItem);
 	}
+
+	@Override
+	public void deleteAllItemsByCartId(Long cartId) {
+		cartItemRepository.deleteAllByCartId(cartId);
+	}
 }

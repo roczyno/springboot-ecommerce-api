@@ -14,6 +14,7 @@ import com.roczyno.springbootecommerceapi.util.RatingMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,6 +30,7 @@ public class RatingServiceImpl implements RatingService {
 	private final RatingMapper ratingMapper;
 
 	@Override
+	@Transactional
 	public RatingResponse createRating(RatingRequest req, Long productId, Authentication connectedUser) {
 		User user=(User) connectedUser.getPrincipal();
 		Product product=productMapper.mapToProduct(productService.findProductById(productId));
@@ -57,6 +59,7 @@ public class RatingServiceImpl implements RatingService {
 	}
 
 	@Override
+	@Transactional
 	public String deleteRating(Long id, Authentication connectedUser) {
 		User user=(User) connectedUser.getPrincipal();
 		Rating rating=ratingMapper.mapToRating(getRating(id));
@@ -66,6 +69,7 @@ public class RatingServiceImpl implements RatingService {
 	}
 
 	@Override
+	@Transactional
 	public RatingResponse updateRating(Long id, Authentication connectedUser, RatingRequest req) {
 		User user=(User) connectedUser.getPrincipal();
 		Rating rating=ratingMapper.mapToRating(getRating(id));

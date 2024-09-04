@@ -10,4 +10,5 @@ public interface CartService {
 	String addCartItem(Authentication connectedUser, AddItemRequest req,Long productId);
 	CartResponse findUserCart(Authentication connectedUser);
 	String removeItemFromCart(Long id,Authentication connectedUser);
+	void clearCart(Authentication connectedUser);
 }

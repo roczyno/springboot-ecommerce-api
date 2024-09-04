@@ -84,6 +84,7 @@ public class OrderServiceImpl  implements OrderService {
 		for(OrderItem item: orderItems){
 			item.setOrder(savedOrder);
 		}
+		cartService.clearCart(connectedUser);
 		return orderMapper.mapToOrderResponse(savedOrder);
 	}
 

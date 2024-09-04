@@ -14,4 +14,5 @@ public interface CartItemService {
 	CartItem isCartItemExist(Cart cart, Product product, User user, String size);
 	void removeCartItem(Long cartItemId);
 	CartItemResponse findCartItemById(Long cartItemId);
+	void deleteAllItemsByCartId(Long id);
 }
