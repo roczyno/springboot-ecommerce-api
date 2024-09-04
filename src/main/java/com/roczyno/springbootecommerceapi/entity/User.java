@@ -42,8 +42,6 @@ public class User implements UserDetails, Principal {
     private String lastName;
     @Column(unique = true)
     private String email;
-    private int numberOfAuctionsCreated;
-    private int numberOfBids;
     private String password;
     private String profilePic;
     private String phone;

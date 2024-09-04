@@ -77,6 +77,7 @@ public class OrderServiceImpl  implements OrderService {
 				.shippingAddress(user.getAddress())
 				.orderDate(LocalDateTime.now())
 				.orderStatus("PLACED")
+				.deliveryDate(LocalDateTime.now().plusDays(7))
 				.createdAt(LocalDateTime.now())
 				.build();
 		Order savedOrder=orderRepository.save(createdOrder);
