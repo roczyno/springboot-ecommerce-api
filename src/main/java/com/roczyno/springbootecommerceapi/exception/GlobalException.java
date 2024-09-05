@@ -1,12 +1,11 @@
 package com.roczyno.springbootecommerceapi.exception;
 
 
+import com.roczyno.springbootecommerceapi.util.ResponseHandler;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
-import org.apache.coyote.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -27,14 +26,23 @@ public class GlobalException {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalException.class);
 
-@ExceptionHandler(BadRequestException.class)
+
+    @ExceptionHandler({
+            UserException.class,
+            RatingException.class,
+            ReviewException.class,
+            ProductException.class,
+            CartException.class,
+            CartItemException.class
+    })
     public ResponseEntity<Object> handleBadRequestExceptions(RuntimeException ex, WebRequest req) {
         logException(ex);
         List<ErrorDetails> errors = Collections.singletonList(
                 new ErrorDetails(ex.getMessage(), req.getDescription(false), LocalDateTime.now())
         );
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        return ResponseHandler.errorResponse(errors, HttpStatus.BAD_REQUEST);
     }
+
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<Object> handleValidationException(ConstraintViolationException ex) {
@@ -43,7 +51,7 @@ public class GlobalException {
                 .map(ConstraintViolation::getMessage)
                 .collect(Collectors.joining("\n"));
         ErrorDetails errorDetails = new ErrorDetails(errorMessage, "Validation Error", LocalDateTime.now());
-        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+        return ResponseHandler.errorResponse(errorDetails, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -52,7 +60,7 @@ public class GlobalException {
         List<ErrorDetails> errors = ex.getBindingResult().getFieldErrors().stream()
                 .map(error -> new ErrorDetails(error.getDefaultMessage(), error.getField(), LocalDateTime.now()))
                 .collect(Collectors.toList());
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        return ResponseHandler.errorResponse(errors, HttpStatus.BAD_REQUEST);
     }
 
 
@@ -63,7 +71,7 @@ public class GlobalException {
     public ResponseEntity<Object> handleAccessDeniedException(AccessDeniedException ex) {
         logException(ex);
         List<String> errors = Collections.singletonList(ex.getMessage());
-        return new ResponseEntity<>(getErrorsMap(errors), new HttpHeaders(), HttpStatus.FORBIDDEN);
+        return ResponseHandler.errorResponse(getErrorsMap(errors), HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(Exception.class)
@@ -72,7 +80,7 @@ public class GlobalException {
         List<ErrorDetails> errors = Collections.singletonList(
                 new ErrorDetails(ex.getMessage(), req.getDescription(false), LocalDateTime.now())
         );
-        return new ResponseEntity<>(errors, HttpStatus.INTERNAL_SERVER_ERROR);
+        return ResponseHandler.errorResponse(errors, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private void logException(Exception ex) {
