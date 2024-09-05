@@ -18,6 +18,8 @@ import com.roczyno.springbootecommerceapi.util.OrderItemMapper;
 import com.roczyno.springbootecommerceapi.util.OrderMapper;
 import com.roczyno.springbootecommerceapi.util.UserMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -97,12 +99,11 @@ public class OrderServiceImpl  implements OrderService {
 	}
 
 	@Override
-	public List<OrderResponse> userOrderHistory(Integer userId) {
+	public Page<OrderResponse> userOrderHistory(Integer userId, Pageable pageable) {
 		User user=userMapper.toUser(userService.getUserById(userId));
-		List<Order> userOrders=orderRepository.findUserOrders(user);
-		return userOrders.stream()
-				.map(orderMapper::mapToOrderResponse)
-				.toList();
+		Page<Order> userOrders=orderRepository.findUserOrders(user,pageable);
+		return userOrders.map(orderMapper::mapToOrderResponse);
+
 	}
 
 
@@ -116,11 +117,10 @@ public class OrderServiceImpl  implements OrderService {
 	}
 
 	@Override
-	public List<OrderResponse> getAllOrders() {
-		List<Order> orders= orderRepository.findAll();
-		return orders.stream()
-				.map(orderMapper::mapToOrderResponse)
-				.toList();
+	public Page<OrderResponse> getAllOrders(Pageable pageable) {
+		Page<Order> orders= orderRepository.findAll(pageable);
+		return orders.map(orderMapper::mapToOrderResponse);
+
 	}
 
 	@Override

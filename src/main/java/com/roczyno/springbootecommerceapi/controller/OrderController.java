@@ -1,8 +1,11 @@
 package com.roczyno.springbootecommerceapi.controller;
 
+import com.roczyno.springbootecommerceapi.response.OrderResponse;
 import com.roczyno.springbootecommerceapi.service.OrderService;
 import com.roczyno.springbootecommerceapi.util.ResponseHandler;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -30,12 +33,12 @@ public class OrderController {
 		return ResponseHandler.successResponse(orderService.findOrderById(id),HttpStatus.OK);
 	}
 	@GetMapping("/user/{userId}")
-	public ResponseEntity<Object> getUserOrderHistories(@PathVariable Integer userId){
-		return ResponseHandler.successResponse(orderService.userOrderHistory(userId),HttpStatus.OK);
+	public ResponseEntity<Page<OrderResponse>> getUserOrderHistories(@PathVariable Integer userId, Pageable pageable){
+		return ResponseEntity.ok(orderService.userOrderHistory(userId,pageable));
 	}
 	@GetMapping
-	public ResponseEntity<Object> getAllOrders(){
-		return ResponseHandler.successResponse(orderService.getAllOrders(),HttpStatus.OK);
+	public ResponseEntity<Page<OrderResponse>> getAllOrders(Pageable pageable){
+		return ResponseEntity.ok(orderService.getAllOrders(pageable));
 	}
 	@PutMapping("/{id}")
 	public ResponseEntity<Object> updateOrderStatus(@PathVariable Long id, @RequestParam String status){
