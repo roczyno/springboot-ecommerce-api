@@ -12,6 +12,8 @@ import com.roczyno.springbootecommerceapi.service.ReviewService;
 import com.roczyno.springbootecommerceapi.util.ProductMapper;
 import com.roczyno.springbootecommerceapi.util.ReviewMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -47,12 +49,10 @@ public class ReviewServiceImpl implements ReviewService {
 	}
 
 	@Override
-	public List<ReviewResponse> getProductReviews(Long productId) {
+	public Page<ReviewResponse> getProductReviews(Long productId, Pageable pageable) {
 		Product product=productMapper.mapToProduct(productService.findProductById(productId));
-		List<Review> reviews=reviewRepository.findByProduct(product);
-		return reviews.stream()
-				.map(reviewMapper::mapToReviewResponse)
-				.toList();
+		Page<Review> reviews=reviewRepository.findByProduct(product,pageable);
+		return reviews.map(reviewMapper::mapToReviewResponse);
 	}
 
 	@Override
