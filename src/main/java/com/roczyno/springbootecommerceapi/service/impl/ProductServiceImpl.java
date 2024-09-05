@@ -12,10 +12,14 @@ import com.roczyno.springbootecommerceapi.service.ProductService;
 import com.roczyno.springbootecommerceapi.util.CategoryMapper;
 import com.roczyno.springbootecommerceapi.util.ProductMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -108,31 +112,35 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	public List<ProductResponse> findProductByCategory(String category) {
-		List<Product> products=productRepository.findByCategory(category);
-		return products.stream()
-				.map(productMapper::mapToProductResponse)
-				.toList();
+	public Page<ProductResponse> findProductByCategory(String category, Pageable pageable) {
+		Page<Product> products=productRepository.findByCategory(category,pageable);
+		return products.map(productMapper::mapToProductResponse);
 	}
 
 	@Override
-	public List<ProductResponse> getAllProducts(String category, List<String> colors, List<String> sizes, Integer minPrice,
-												Integer maxPrice, Integer minDiscount, String stock, String sort) {
-		List<Product> products = productRepository.filterProduct(category, minPrice, maxPrice, minDiscount, sort);
+	public Page<ProductResponse> getAllProducts(String category, List<String> colors, List<String> sizes, Integer minPrice,
+												Integer maxPrice, Integer minDiscount, String stock, String sort, Pageable pageable) {
+		// Fetch paginated products from the repository with initial filtering (before applying in-memory filters)
+		Page<Product> productPage = productRepository.filterProduct(category, minPrice, maxPrice, minDiscount, sort, pageable);
 
+		// Get the list of products from the paginated result
+		List<Product> products = new ArrayList<>(productPage.getContent());
+
+		// Filter by colors if provided
 		if (colors != null && !colors.isEmpty()) {
 			products = products.stream()
 					.filter(p -> colors.stream().anyMatch(c -> c.equalsIgnoreCase(p.getColor())))
 					.collect(Collectors.toList());
 		}
+
+		// Filter by sizes if provided (fixed filtering by size)
 		if (sizes != null && !sizes.isEmpty()) {
 			products = products.stream()
-					.filter(p -> sizes.stream().anyMatch(s -> s.equalsIgnoreCase(p.getColor())))
+					.filter(p -> sizes.stream().anyMatch(s -> s.equalsIgnoreCase(p.getSizes().toString())))
 					.collect(Collectors.toList());
 		}
 
-
-
+		// Filter by stock availability if provided
 		if (stock != null) {
 			products = switch (stock) {
 				case "in_stock" -> products.stream()
@@ -145,10 +153,16 @@ public class ProductServiceImpl implements ProductService {
 			};
 		}
 
-		return products.stream()
-				.map(productMapper::mapToProductResponse)
+		// Map each Product to ProductResponse using the mapper
+		List<ProductResponse> productResponses = products.stream()
+				.map(productMapper::mapToProductResponse)  // Assuming productMapper.mapToProductResponse(Product product)
 				.collect(Collectors.toList());
+
+		// Return a paginated response using PageImpl
+		return new PageImpl<>(productResponses, pageable, productPage.getTotalElements());
 	}
+
+
 
 	@Override
 	public List<ProductResponse> searchForProducts(String keyword) {

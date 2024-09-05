@@ -1,10 +1,12 @@
 package com.roczyno.springbootecommerceapi.controller;
 
-import com.roczyno.springbootecommerceapi.entity.Category;
 import com.roczyno.springbootecommerceapi.request.ProductRequest;
+import com.roczyno.springbootecommerceapi.response.ProductResponse;
 import com.roczyno.springbootecommerceapi.service.ProductService;
 import com.roczyno.springbootecommerceapi.util.ResponseHandler;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,17 +32,18 @@ public class ProductController {
 		return ResponseHandler.successResponse(productService.createProduct(request), HttpStatus.OK);
 	}
 	@GetMapping
-	public ResponseEntity<Object> getAllProducts( @RequestParam(required = false) String category,
-												  @RequestParam(required = false) List<String> colors,
-												  @RequestParam(required = false) List<String> sizes,
-												  @RequestParam(required = false) Integer minPrice,
-												  @RequestParam(required = false) Integer maxPrice,
-												  @RequestParam(required = false) Integer minDiscount,
-												  @RequestParam(required = false) String sort,
-												  @RequestParam(required = false) String stock){
-		return ResponseHandler.successResponse(productService.getAllProducts(
+	public ResponseEntity<Page<ProductResponse>> getAllProducts(@RequestParam(required = false) String category,
+																@RequestParam(required = false) List<String> colors,
+																@RequestParam(required = false) List<String> sizes,
+																@RequestParam(required = false) Integer minPrice,
+																@RequestParam(required = false) Integer maxPrice,
+																@RequestParam(required = false) Integer minDiscount,
+																@RequestParam(required = false) String sort,
+																@RequestParam(required = false) String stock,
+																Pageable pageable){
+		return ResponseEntity.ok(productService.getAllProducts(
 				category, colors, sizes, minPrice, maxPrice,
-				minDiscount, sort, stock),HttpStatus.OK);
+				minDiscount, sort, stock,pageable));
 
 	}
 	@GetMapping("/{productId}")
@@ -49,8 +52,8 @@ public class ProductController {
 	}
 
 	@GetMapping("/cat")
-	public ResponseEntity<Object> findProductByCategory(@RequestParam String cat){
-		return ResponseHandler.successResponse(productService.findProductByCategory(cat),HttpStatus.OK);
+	public ResponseEntity<Object> findProductByCategory(@RequestParam String cat,Pageable pageable){
+		return ResponseHandler.successResponse(productService.findProductByCategory(cat,pageable),HttpStatus.OK);
 	}
 
 	@PutMapping("/{productId}")
